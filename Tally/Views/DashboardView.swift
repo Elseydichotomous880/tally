@@ -25,7 +25,7 @@ struct DashboardView: View {
             Image(systemName: "gauge.medium").foregroundStyle(.tint)
             Text("Tally").font(.title3.weight(.semibold))
             Spacer()
-            TimelineView(.periodic(from: .now, by: 30)) { context in
+            TimelineView(.periodic(from: .now, by: 1)) { context in
                 if let updated = UsageFormat.updatedAgo(store.lastSuccessfulRefreshAt,
                                                         now: context.date) {
                     Text(updated).font(.caption).foregroundStyle(.secondary)

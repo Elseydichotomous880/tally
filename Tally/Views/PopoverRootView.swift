@@ -89,16 +89,18 @@ struct PopoverRootView: View {
                 }
                 .padding(.top, 3)   // optically align with the title's baseline
                 Spacer()
-                // TimelineView re-evaluates on a clock, so "updated 2m ago" keeps advancing while the
-                // popover/panel stays open (a plain render froze it at whatever it said on open). The
-                // date sits alongside as the anchor for the absolute reset times.
-                TimelineView(.periodic(from: .now, by: 30)) { context in
+                // TimelineView re-evaluates every second so "updated 42s ago" counts live — at a
+                // 1-minute refresh cadence, minute granularity carried no information (a plain render
+                // would freeze it at whatever it said on open). Hierarchy: the date is the anchor the
+                // absolute reset times are read against, so it leads; the ago-counter is a heartbeat,
+                // so it dims.
+                TimelineView(.periodic(from: .now, by: 1)) { context in
                     HStack(spacing: 6) {
                         Text(UsageFormat.nowShort(context.date))
-                            .font(.caption2).foregroundStyle(.tertiary)
+                            .font(.caption2.weight(.medium)).foregroundStyle(.primary)
                         if let updated = UsageFormat.updatedAgo(store.lastSuccessfulRefreshAt,
                                                                 now: context.date) {
-                            Text(updated).font(.caption2).foregroundStyle(.secondary)
+                            Text(updated).font(.caption2).foregroundStyle(.tertiary)
                         }
                     }
                 }
