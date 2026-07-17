@@ -7,20 +7,31 @@ import SwiftUI
 struct SettingsView: View {
     @Bindable var store: UsageStore
     @Bindable var settings: SettingsStore
+    private var paneState = SettingsPaneState.shared
+
+    init(store: UsageStore, settings: SettingsStore) {
+        self.store = store
+        self.settings = settings
+    }
 
     var body: some View {
         // Key `.id` on the language so switching it rebuilds the whole form and re-localizes every
         // label (see PopoverRootView for why a bare read isn't enough).
-        Form {
-            accountsSection
-            displaySection
-            generalSection
-            aboutSection
+        Group {
+            switch paneState.pane {
+            case .accounts:
+                Form { accountsSection }
+            case .general:
+                Form {
+                    displaySection
+                    generalSection
+                    aboutSection
+                }
+            }
         }
         .formStyle(.grouped)
-        .toggleStyle(.switch)
         .controlSize(.small)
-        .frame(width: 460, height: 540)
+        .frame(width: 500, height: paneState.pane == .accounts ? 360 : 460)
         .id(settings.languageOverride ?? "system")
     }
 
@@ -56,6 +67,7 @@ struct SettingsView: View {
                 }
             }
         }
+        .toggleStyle(.switch)
 
         if settings.isEnabled(id) {
             ForEach(accounts) { account in
@@ -64,12 +76,16 @@ struct SettingsView: View {
         }
     }
 
+    /// One line per account: a rename field (placeholder = the provider's default name, so an
+    /// untouched field reads as the account, not as an empty control) + a menu-bar checkbox.
+    /// Checkbox, not switch: per-item inclusion in a list is checkbox territory; switches stay
+    /// reserved for the few real on/off preferences.
     private func accountRow(_ account: AccountUsage) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            TextField(account.accountLabel, text: Binding(
+        HStack(spacing: 12) {
+            TextField("", text: Binding(
                 get: { settings.accountLabels[account.id] ?? "" },
                 set: { settings.accountLabels[account.id] = $0.isEmpty ? nil : $0 }
-            ))
+            ), prompt: Text(account.accountLabel))
             .textFieldStyle(.roundedBorder)
 
             Toggle(isOn: Binding(
@@ -78,6 +94,8 @@ struct SettingsView: View {
             )) {
                 Text(L("Show in menu bar")).font(.caption).foregroundStyle(.secondary)
             }
+            .toggleStyle(.checkbox)
+            .fixedSize()
         }
         .padding(.leading, 30)   // nested under the provider row's icon column
     }
@@ -98,11 +116,13 @@ struct SettingsView: View {
                 Text(L("Show every model tier")).font(.subheadline)
                 Text(L("Off shows only the highest-tier model at a glance."))
             }
+            .toggleStyle(.switch)
 
             Toggle(isOn: $settings.isPanelTranslucent) {
                 Text(L("Glass pinned panel")).font(.subheadline)
                 Text(L("The pinned panel shows the desktop through frosted glass."))
             }
+            .toggleStyle(.switch)
         }
     }
 

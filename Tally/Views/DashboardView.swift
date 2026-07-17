@@ -10,21 +10,21 @@ struct DashboardView: View {
         // Key `.id` on the language so a change tears down + rebuilds the whole tree — a bare read
         // wouldn't re-localize the AccountCardView children (see PopoverRootView for the full note).
         VStack(spacing: 0) {
-            header
-            Divider()
             content
             Divider()
             footer
         }
-        .frame(minWidth: 380, minHeight: 420)
+        .frame(minWidth: 380, minHeight: 300)
+        // The window's own titlebar is the header ("Tally" title leads, actions trail) — an
+        // in-content header row doubled the branding and pushed the cards down for nothing.
+        // Bridged onto the NSWindow via `sceneBridgingOptions = [.toolbars]`.
+        .toolbar { toolbarItems }
         .id(settings.languageOverride ?? "system")
     }
 
-    private var header: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "gauge.medium").foregroundStyle(.tint)
-            Text("Tally").font(.title3.weight(.semibold))
-            Spacer()
+    @ToolbarContentBuilder
+    private var toolbarItems: some ToolbarContent {
+        ToolbarItemGroup(placement: .primaryAction) {
             TimelineView(.periodic(from: .now, by: 1)) { context in
                 if let counter = store.isRefreshing
                     ? L("updating…")
@@ -41,13 +41,10 @@ struct DashboardView: View {
                         ? .linear(duration: 1).repeatForever(autoreverses: false) : .default,
                         value: store.isRefreshing)
             }
-            .buttonStyle(.borderless)
             .disabled(store.isRefreshing)
             .accessibilityLabel(L("Refresh"))
             .help(L("Refresh"))
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
     }
 
     @ViewBuilder
@@ -57,9 +54,11 @@ struct DashboardView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             ScrollView {
+                // Track width capped at 312pt: the meters are legible at popover width, and a
+                // resizable window should add columns, not stretch one card's bars ever longer.
                 LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 288, maximum: 360), spacing: TallyMetrics.sectionSpacing)],
-                    spacing: TallyMetrics.sectionSpacing
+                    columns: [GridItem(.adaptive(minimum: 276, maximum: 312), spacing: 16)],
+                    spacing: 16
                 ) {
                     ForEach(store.orderedAccounts) { usage in
                         AccountCardView(usage: usage, settings: settings)
@@ -71,25 +70,32 @@ struct DashboardView: View {
         }
     }
 
+    // Same footer as the popover, so the two dashboards share one set of muscle memory.
     private var footer: some View {
         HStack {
-            Button {
-                settings.displayMode = settings.displayMode.toggled
-            } label: {
-                Label(settings.displayMode == .used ? L("Showing: Used") : L("Showing: Left"),
-                      systemImage: "arrow.left.arrow.right").font(.caption)
+            Picker("", selection: $settings.displayMode) {
+                Text(L("Left")).tag(DisplayMode.remaining)
+                Text(L("Used")).tag(DisplayMode.used)
             }
-            .buttonStyle(.borderless)
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .controlSize(.mini)
+            .fixedSize()
+            .help(L("Meters show"))
             Spacer()
             Button {
                 StatusItemController.openSettingsWindow()
             } label: {
                 Image(systemName: "gearshape")
+                    .font(.callout)
+                    .frame(width: 28, height: 28)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.borderless)
+            .foregroundStyle(.secondary)
             .help(L("Settings…"))
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 4)
     }
 }
