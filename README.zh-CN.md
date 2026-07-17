@@ -148,4 +148,4 @@ Tally 内置 English、繁體中文、简体中文、日本語、한국어，设
 
 ## 许可证
 
-[MIT](LICENSE) © jetto
+[MIT](LICENSE) © [jetto](https://jetto.ai)

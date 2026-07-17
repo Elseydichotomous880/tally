@@ -163,4 +163,4 @@ Tally는 자격 증명을 읽지 않기 때문입니다. 사용량은 공식 CLI
 
 ## 라이선스
 
-[MIT](LICENSE) © jetto
+[MIT](LICENSE) © [jetto](https://jetto.ai)

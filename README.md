@@ -161,4 +161,4 @@ transcript is never modified). An interrupted tool call may re-run once after th
 
 ## License
 
-[MIT](LICENSE) © jetto
+[MIT](LICENSE) © [jetto](https://jetto.ai)
